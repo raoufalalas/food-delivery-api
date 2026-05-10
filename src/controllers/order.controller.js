@@ -1,5 +1,5 @@
 const { Order, Product, Market, User } = require('../models');
-
+const { getIO } = require('../socket');
 // Customer يعمل طلب جديد
 const createOrder = async (req, res) => {
   try {
@@ -94,6 +94,12 @@ const updateOrderStatus = async (req, res) => {
     }
 
     await order.update({ status });
+     // 🔴 أبعت للـ Customer إن الحالة اتغيرت
+    getIO().to(`order_${order.id}`).emit('order_status_update', {
+      orderId: order.id,
+      status,
+      updatedAt: new Date()
+    });
     res.json({ message: `Order status updated to "${status}"`, order });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -110,6 +116,13 @@ const assignDriver = async (req, res) => {
     }
 
     await order.update({ driverId: req.user.id, status: 'on_the_way' });
+    // 🔴 أبلغ الـ Customer إن السائق جاي
+    getIO().to(`order_${order.id}`).emit('order_status_update', {
+      orderId: order.id,
+      status: 'on_the_way',
+      driverId: req.user.id,
+      updatedAt: new Date()
+    });
     res.json({ message: 'Driver assigned successfully', order });
   } catch (err) {
     res.status(500).json({ message: err.message });
