@@ -5,6 +5,8 @@ const morgan  = require('morgan');
 
 require('./models');
 
+const authRoutes = require('./routes/auth.routes');
+
 const app = express();
 
 app.use(helmet());
@@ -20,6 +22,8 @@ app.get('/', (req, res) => {
     version: '1.0.0',
   });
 });
+
+app.use('/api/auth', authRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
