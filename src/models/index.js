@@ -4,9 +4,8 @@ const Product = require('./Product');
 const Order   = require('./Order');
 
 // User ينشئ Market
-User.hasMany(Market,  { foreignKey: 'ownerId' });
-Market.belongsTo(User, { foreignKey: 'ownerId' });
-
+User.hasMany(Market,   { foreignKey: 'ownerId', as: 'markets' });
+Market.belongsTo(User, { foreignKey: 'ownerId', as: 'owner' });
 // Market عنده Products
 Market.hasMany(Product,  { foreignKey: 'marketId' });
 Product.belongsTo(Market, { foreignKey: 'marketId' });
