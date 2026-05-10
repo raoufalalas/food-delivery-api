@@ -1,0 +1,44 @@
+# =============================================
+# docker-compose.yml — تنسيق الـ Containers
+# =============================================
+
+version: '3.8'
+
+services:
+  # =====================
+  # الـ API Service
+  # =====================
+  api:
+    # ابني الـ Image من الـ Dockerfile الموجود في نفس المجلد
+    build: .
+    
+    # اسم الـ Container
+    container_name: food-delivery-api
+    
+    # ربط البورت: (خارج الـ Container):(جوا الـ Container)
+    # يعني لما حد يفتح localhost:5000 يوصل لـ 5000 جوا الـ Container
+    ports:
+      - "5000:5000"
+    
+    # متغيرات البيئة — بتتقرأ من ملف .env
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRE=${JWT_EXPIRE}
+    
+    # إعادة التشغيل التلقائي لو الـ Container وقع
+    # unless-stopped = اشتغل دايماً إلا لو أنا وقفته يدوياً
+    restart: unless-stopped
+    
+    # الشبكة الداخلية للـ Containers
+    networks:
+      - food-delivery-network
+
+# =====================
+# الشبكة الداخلية
+# =====================
+networks:
+  food-delivery-network:
+    driver: bridge
