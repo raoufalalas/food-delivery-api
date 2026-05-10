@@ -4,7 +4,7 @@ const helmet     = require('helmet');
 const morgan     = require('morgan');
 
 require('./models');
-
+const adminRoutes = require('./routes/admin.routes');
 const authRoutes    = require('./routes/auth.routes');
 const marketRoutes  = require('./routes/market.routes');
 const productRoutes = require('./routes/product.routes');
@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
   res.json({ message: '🍕 Food Delivery API is running!', status: 'ok', version: '1.0.0' });
 });
-
+app.use('/api/admin', adminRoutes);
 app.use('/api/auth',     authRoutes);
 app.use('/api/markets',  marketRoutes);
 app.use('/api/products', productRoutes);
