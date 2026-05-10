@@ -3,6 +3,8 @@ const cors    = require('cors');
 const helmet  = require('helmet');
 const morgan  = require('morgan');
 
+require('./models');
+
 const app = express();
 
 app.use(helmet());
@@ -12,7 +14,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-  res.json({ message: '🍕 Food Delivery API is running!' });
+  res.json({
+    message: '🍕 Food Delivery API is running!',
+    status:  'ok',
+    version: '1.0.0',
+  });
 });
 
 app.use((req, res) => {
