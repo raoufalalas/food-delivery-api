@@ -1,4 +1,5 @@
 const { Order, Product, Market, User } = require('../models');
+const { Op } = require('sequelize');
 const { getIO } = require('../socket');
 // Customer يعمل طلب جديد
 const createOrder = async (req, res) => {
@@ -111,8 +112,8 @@ const assignDriver = async (req, res) => {
   try {
     const order = await Order.findByPk(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
-    if (order.status !== 'accepted') {
-      return res.status(400).json({ message: 'Order must be accepted first' });
+    if (!['accepted', 'preparing'].includes(order.status)) {
+      return res.status(400).json({ message: 'Order not ready for pickup' });
     }
 
     await order.update({ driverId: req.user.id, status: 'on_the_way' });
@@ -133,7 +134,7 @@ const assignDriver = async (req, res) => {
 const getAvailableOrders = async (req, res) => {
   try {
     const orders = await Order.findAll({
-      where: { status: 'accepted', driverId: null },
+      where: { status: ['accepted', 'preparing'], driverId: null },
       include: [
         { model: Market, as: 'Market', attributes: ['id', 'name', 'address'] }
       ]
@@ -163,7 +164,25 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+
+// Driver يشوف طلباته هو
+const getMyDeliveries = async (req, res) => {
+  try {
+    const orders = await Order.findAll({
+      where: { driverId: req.user.id },
+      include: [
+        { model: Market, as: 'Market', attributes: ['id', 'name'] },
+        { model: User, as: 'customer', attributes: ['id', 'name', 'phone'] }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+    res.json({ orders });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   createOrder, getMyOrders, getMarketOrders,
-  updateOrderStatus, assignDriver, getAvailableOrders, getAllOrders
+  updateOrderStatus, assignDriver, getAvailableOrders, getAllOrders, getMyDeliveries
 };
