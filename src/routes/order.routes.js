@@ -13,7 +13,7 @@ router.get('/market',       protect, authorize('market'),   getMarketOrders);
 router.get('/my-deliveries', protect, authorize('driver'), getMyDeliveries);
 router.get('/available',    protect, authorize('driver'),   getAvailableOrders);
 router.patch('/:id/assign', protect, authorize('driver'),   assignDriver);
-router.patch('/:id/status', protect, authorize('market', 'admin', 'driver'), updateStatusValidator, validate, updateOrderStatus);
+router.patch('/:id/status', protect, authorize('market', 'admin', 'driver', 'customer'), updateStatusValidator, validate, updateOrderStatus);
 router.get('/',             protect, authorize('admin'),    getAllOrders);
 
 module.exports = router;
